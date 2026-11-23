@@ -8,9 +8,11 @@ Every agent is assigned **one** feature slot and must stay strictly within its d
 
 | Agent Role | Assigned Branch | Exclusive Territory | Unit Test Command |
 | :--- | :--- | :--- | :--- |
-| **Agent-Discount** | `feat/app-discount-widget` | `src/features/discount/**` | `node --test src/features/discount/index.test.mjs` |
-| **Agent-Tax** | `feat/app-tax-widget` | `src/features/tax/**` | `node --test src/features/tax/index.test.mjs` |
-| **Agent-Shipping** | `feat/app-shipping-widget` | `src/features/shipping/**` | `node --test src/features/shipping/index.test.mjs` |
+| **Agent-Discount** | `feat/vendor-claude-discount` | `src/features/discount/**` | `node --test src/features/discount/index.test.mjs` |
+| **Agent-Codex-Loyalty** | `feat/codex-loyalty` | `src/features/loyalty/**` | `node --test src/features/loyalty/index.test.mjs` |
+| **Agent-Tax** | `feat/vendor-gpt-tax` | `src/features/tax/**` | `node --test src/features/tax/index.test.mjs` |
+| **Agent-OpenCode-Insurance** | `feat/opencode-insurance` | `src/features/insurance/**` | `node --test src/features/insurance/index.test.mjs` |
+| **Agent-Shipping** | `feat/vendor-gemini-shipping` | `src/features/shipping/**` | `node --test src/features/shipping/index.test.mjs` |
 
 ## 2. Shared Hotspot Lock (Forbidden Files)
 
@@ -18,6 +20,10 @@ All agents are **strictly forbidden** from modifying any file outside their assi
 - `package.json`
 - `README.md`
 - `AGENTS.md`
+- `TASKS.md`
+- `CLAUDE.md`
+- `.cursorrules`
+- `.github/copilot-instructions.md`
 - `src/index.mjs`
 - `src/server.mjs` (Web host server is frozen)
 - `src/core/**` (auto-discovery loader is frozen)

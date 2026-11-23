@@ -15,15 +15,15 @@
 
 /**
  * @typedef {Object} PluginAdjustment
- * @property {'discount'|'tax'|'shipping'} pluginId - Must match plugin.id
+ * @property {'discount'|'loyalty'|'tax'|'insurance'|'shipping'} pluginId - Must match plugin.id
  * @property {string} label - Non-empty human-readable description
- * @property {number} deltaAmount - Price adjustment in USD (<= 0 for discount; >= 0 for tax/shipping)
+ * @property {number} deltaAmount - Price adjustment in USD (<= 0 for discount/loyalty; >= 0 for tax/insurance/shipping)
  * @property {Record<string, unknown>} meta - Structured metadata for auditing
  */
 
 /**
  * @typedef {Object} WidgetOutput
- * @property {'discount'|'tax'|'shipping'} pluginId - Must match plugin.id
+ * @property {'discount'|'loyalty'|'tax'|'insurance'|'shipping'} pluginId - Must match plugin.id
  * @property {string} title - Card title
  * @property {string} badge - Short status badge text
  * @property {string} summary - One-line summary text
@@ -31,7 +31,7 @@
  * @property {string} html - Non-empty HTML fragment rendered inside the slot card
  */
 
-const VALID_PLUGIN_IDS = new Set(['discount', 'tax', 'shipping']);
+const VALID_PLUGIN_IDS = new Set(['discount', 'loyalty', 'tax', 'insurance', 'shipping']);
 
 /**
  * Rounds a number to 2 decimal places for USD currency values.
@@ -69,11 +69,14 @@ export function validateAdjustment(adj) {
     throw new Error(`Adjustment deltaAmount for "${adj.pluginId}" must be a finite number`);
   }
 
-  if (adj.pluginId === 'discount' && adj.deltaAmount > 0) {
-    throw new Error(`Discount deltaAmount must be <= 0, got ${adj.deltaAmount}`);
+  if ((adj.pluginId === 'discount' || adj.pluginId === 'loyalty') && adj.deltaAmount > 0) {
+    throw new Error(`${adj.pluginId} deltaAmount must be <= 0, got ${adj.deltaAmount}`);
   }
 
-  if ((adj.pluginId === 'tax' || adj.pluginId === 'shipping') && adj.deltaAmount < 0) {
+  if (
+    (adj.pluginId === 'tax' || adj.pluginId === 'insurance' || adj.pluginId === 'shipping') &&
+    adj.deltaAmount < 0
+  ) {
     throw new Error(`${adj.pluginId} deltaAmount must be >= 0, got ${adj.deltaAmount}`);
   }
 

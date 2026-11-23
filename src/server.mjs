@@ -425,7 +425,9 @@ const APP_HTML = `<!DOCTYPE html>
 
     const OWNER_LABELS = {
       discount: 'Slot 1 · Owned by Agent-Discount (src/features/discount/)',
+      loyalty: 'Slot 4 · Assigned to Codex (src/features/loyalty/)',
       tax: 'Slot 2 · Owned by Agent-Tax (src/features/tax/)',
+      insurance: 'Slot 5 · Assigned to OpenCode (src/features/insurance/)',
       shipping: 'Slot 3 · Owned by Agent-Shipping (src/features/shipping/)',
     };
 
