@@ -360,6 +360,7 @@ const APP_HTML = `<!DOCTYPE html>
           <button class="chip" data-coupon="">None</button>
           <button class="chip" data-coupon="SAVE10">SAVE10</button>
           <button class="chip active" data-coupon="VIP20">VIP20</button>
+          <button class="chip" data-coupon="VIP_BUNDLE">VIP_BUNDLE</button>
           <button class="chip" data-coupon="FLASH30">FLASH30</button>
         </div>
       </div>
@@ -369,8 +370,10 @@ const APP_HTML = `<!DOCTYPE html>
         <div class="btn-row" id="region-row">
           <button class="chip active" data-region="US-CA">US-CA</button>
           <button class="chip" data-region="US-NY">US-NY</button>
+          <button class="chip" data-region="US-TX">US-TX</button>
           <button class="chip" data-region="EU-DE">EU-DE</button>
           <button class="chip" data-region="CN">CN</button>
+          <button class="chip" data-region="SG">SG</button>
           <button class="chip" data-region="JP">JP</button>
         </div>
       </div>

@@ -1,0 +1,6 @@
+# Cursor AI Collaboration Rules
+Always follow AGENTS.md and src/types/contracts.mjs.
+1. Only modify files inside the single assigned feature directory under src/features/<slot>/.
+2. Never modify package.json, src/server.mjs, src/index.mjs, src/core/**, or src/types/**.
+3. Preserve all existing exported plugin metadata (id, order, implemented: true) and validate outputs with validateAdjustment and validateWidgetOutput.
+4. Add unit tests inside src/features/<slot>/index.test.mjs and run node --test before finishing.
