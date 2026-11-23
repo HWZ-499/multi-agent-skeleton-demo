@@ -23,6 +23,8 @@ export const TAX_REGIMES = [
   { code: 'US-NY', rate: 0.08, taxType: 'New York Sales Tax' },
   { code: 'EU-DE', rate: 0.19, taxType: 'Germany EU VAT' },
   { code: 'CN', rate: 0.13, taxType: 'China VAT' },
+  { code: 'US-TX', rate: 0.0625, taxType: 'Texas Sales Tax' },
+  { code: 'SG', rate: 0.09, taxType: 'Singapore GST' },
 ];
 
 export const DEFAULT_TAX_REGIME = {
