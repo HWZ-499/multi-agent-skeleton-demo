@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.mjs",
+    "serve": "node src/server.mjs",
     "test": "node --test"
   }
 }

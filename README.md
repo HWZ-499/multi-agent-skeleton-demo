@@ -1,42 +1,30 @@
-# Multi-Agent Skeleton Demo
+# Multi-Agent Checkout & Pricing Studio
 
-A practical reference repository demonstrating how multiple AI coding agents can develop features in parallel on the same codebase with **zero merge conflicts**.
+A practical full-stack demonstration built on a **Slot-based Multi-Agent Skeleton**, showing how 3 AI coding agents collaborate in parallel on the same web application with **zero merge conflicts**.
 
-## Core Architecture: Slot-Based Skeleton
+## Full-Stack Slot Architecture
 
-Instead of letting agents edit shared entry points or invent inconsistent directory structures, this repository separates **frozen infrastructure** from **parallel fill-in-the-blank slots**:
+Instead of letting agents edit shared server routes, HTML layouts, or entry points, this repository separates **frozen host infrastructure** from **parallel feature slots**:
 
-1. **Auto-Discovery Plugin Loader (`src/core/loader.mjs`)**
-   Dynamically scans `src/features/*/index.mjs`, sorts plugins by `order`, and executes them. Agents never touch `src/index.mjs` or register routes/handlers manually.
-2. **Frozen Data Contracts (`src/types/contracts.mjs`)**
-   Defines and runtime-validates the `OrderContext` input and `PluginAdjustment` output shapes (`roundCurrency`, `validateAdjustment`).
-3. **Pre-Allocated Stub Slots (`src/features/*/index.mjs`)**
-   Each module (`discount`, `tax`, `shipping`) starts as a typed stub with `implemented: false` and an explicit comment specification.
-4. **Git Worktree Isolation + PR Integration**
-   Each agent works in its own physical worktree (`wt-discount`, `wt-tax`, `wt-shipping`) on its own branch (`feat/agent-discount`, `feat/agent-tax`, `feat/agent-shipping`), and merges back to `main` via Pull Requests with zero conflicts.
-
-## Directory Layout
-
-```text
-multi-agent-skeleton-demo/
-├── AGENTS.md                       # Territory boundaries & hotspot lock rules
-├── package.json                    # Zero-dependency Node.js ESM config
-├── README.md
-└── src/
-    ├── index.mjs                   # Sample pipeline runner (frozen)
-    ├── core/
-    │   └── loader.mjs              # Auto-discovery pipeline loader (frozen)
-    ├── types/
-    │   └── contracts.mjs           # Shared currency & validation contracts (frozen)
-    └── features/
-        ├── discount/index.mjs      # Slot 1 -> Agent-Discount
-        ├── tax/index.mjs           # Slot 2 -> Agent-Tax
-        └── shipping/index.mjs      # Slot 3 -> Agent-Shipping
-```
+1. **Web App Host (`src/server.mjs`)**
+   Zero-dependency Node.js HTTP server (`http://localhost:3090`) serving the interactive **Checkout & Pricing Studio** UI and `/api/calculate` endpoint.
+2. **Auto-Discovery Plugin & Widget Loader (`src/core/loader.mjs`)**
+   Automatically discovers `src/features/*/index.mjs` (pricing logic) and `src/features/*/widget.mjs` (UI card renderer) without any agent touching `src/server.mjs` or `src/index.mjs`.
+3. **Frozen Contracts (`src/types/contracts.mjs`)**
+   Validates both backend calculations (`validateAdjustment`) and UI widget payloads (`validateWidgetOutput`).
+4. **Parallel Feature Slots (`src/features/*/`)**
+   - `src/features/discount/` — Owned by `Agent-Discount`
+   - `src/features/tax/` — Owned by `Agent-Tax`
+   - `src/features/shipping/` — Owned by `Agent-Shipping`
 
 ## Quick Start
 
-Run the pipeline:
+Start the interactive Web App (`http://localhost:3090`):
+```bash
+npm run serve
+```
+
+Run the CLI pipeline:
 ```bash
 npm start
 ```
@@ -44,12 +32,4 @@ npm start
 Run all unit tests:
 ```bash
 npm test
-```
-
-## Multi-Agent Worktree Workflow
-
-```bash
-git worktree add ../wt-discount -b feat/agent-discount
-git worktree add ../wt-tax -b feat/agent-tax
-git worktree add ../wt-shipping -b feat/agent-shipping
 ```

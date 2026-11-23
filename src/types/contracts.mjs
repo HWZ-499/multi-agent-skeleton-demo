@@ -1,5 +1,5 @@
 /**
- * Frozen Data Contracts for Multi-Agent Pricing Pipeline.
+ * Frozen Data Contracts for Multi-Agent Pricing Pipeline & Web Widgets.
  * DO NOT MODIFY THIS FILE IN FEATURE BRANCHES.
  */
 
@@ -7,7 +7,7 @@
  * @typedef {Object} OrderContext
  * @property {string} orderId - Unique order identifier
  * @property {number} subtotal - Order subtotal in USD (>= 0)
- * @property {'VIP20'|'SAVE10'|''} couponCode - Optional promo coupon code
+ * @property {'VIP20'|'SAVE10'|'FLASH30'|''} couponCode - Optional promo coupon code
  * @property {'US-CA'|'US-NY'|'EU-DE'|'CN'|string} region - Tax region code
  * @property {number} weightKg - Total package weight in kilograms
  * @property {boolean} isExpress - Whether express shipping is requested
@@ -19,6 +19,16 @@
  * @property {string} label - Non-empty human-readable description
  * @property {number} deltaAmount - Price adjustment in USD (<= 0 for discount; >= 0 for tax/shipping)
  * @property {Record<string, unknown>} meta - Structured metadata for auditing
+ */
+
+/**
+ * @typedef {Object} WidgetOutput
+ * @property {'discount'|'tax'|'shipping'} pluginId - Must match plugin.id
+ * @property {string} title - Card title
+ * @property {string} badge - Short status badge text
+ * @property {string} summary - One-line summary text
+ * @property {Array<{label: string, value: string}>} metrics - At least 2 key/value metric items
+ * @property {string} html - Non-empty HTML fragment rendered inside the slot card
  */
 
 const VALID_PLUGIN_IDS = new Set(['discount', 'tax', 'shipping']);
@@ -72,4 +82,44 @@ export function validateAdjustment(adj) {
   }
 
   return adj;
+}
+
+/**
+ * Validates that a feature slot widget conforms to the frozen UI contract.
+ * @param {'discount'|'tax'|'shipping'} pluginId
+ * @param {WidgetOutput} widget
+ * @returns {WidgetOutput}
+ */
+export function validateWidgetOutput(pluginId, widget) {
+  if (!widget || typeof widget !== 'object' || Array.isArray(widget)) {
+    throw new TypeError(`Widget output for "${pluginId}" must be a non-null plain object`);
+  }
+
+  if (typeof widget.pluginId !== 'string' || widget.pluginId !== pluginId) {
+    throw new Error(`Widget pluginId "${widget.pluginId}" must match "${pluginId}"`);
+  }
+
+  for (const field of ['title', 'badge', 'summary', 'html']) {
+    if (typeof widget[field] !== 'string' || widget[field].trim().length === 0) {
+      throw new Error(`Widget "${pluginId}" field "${field}" must be a non-empty string`);
+    }
+  }
+
+  if (!Array.isArray(widget.metrics) || widget.metrics.length < 2) {
+    throw new Error(`Widget "${pluginId}" must include a metrics array with at least 2 items`);
+  }
+
+  for (const [idx, item] of widget.metrics.entries()) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      throw new TypeError(`Widget "${pluginId}" metric at index ${idx} must be a plain object`);
+    }
+    if (typeof item.label !== 'string' || item.label.trim().length === 0) {
+      throw new Error(`Widget "${pluginId}" metric[${idx}].label must be a non-empty string`);
+    }
+    if (typeof item.value !== 'string' || item.value.trim().length === 0) {
+      throw new Error(`Widget "${pluginId}" metric[${idx}].value must be a non-empty string`);
+    }
+  }
+
+  return widget;
 }
