@@ -216,3 +216,48 @@ describe('discount widget', () => {
     assert.doesNotMatch(widget.html, /NaN/);
   });
 });
+
+describe('discount VIP_BUNDLE coupon', () => {
+  it('applies VIP_BUNDLE 25% discount when subtotal is exactly 150', () => {
+    const result = plugin.apply(makeOrder({ subtotal: 150, couponCode: 'VIP_BUNDLE' }));
+    assert.deepEqual(result, {
+      pluginId: 'discount',
+      label: 'VIP_BUNDLE (25% Off)',
+      deltaAmount: -37.5,
+      meta: { appliedCoupon: 'VIP_BUNDLE' },
+    });
+    assert.equal(validateAdjustment(result), result);
+  });
+
+  it('applies VIP_BUNDLE 25% discount above 150', () => {
+    const result = plugin.apply(makeOrder({ subtotal: 200, couponCode: 'VIP_BUNDLE' }));
+    assert.equal(result.deltaAmount, -50);
+    assert.equal(result.label, 'VIP_BUNDLE (25% Off)');
+    assert.equal(validateAdjustment(result), result);
+  });
+
+  it('does not apply VIP_BUNDLE when subtotal is below 150', () => {
+    const result = plugin.apply(makeOrder({ subtotal: 149.99, couponCode: 'VIP_BUNDLE' }));
+    assert.deepEqual(result, {
+      pluginId: 'discount',
+      label: 'No Discount',
+      deltaAmount: 0,
+      meta: { appliedCoupon: null },
+    });
+    assert.equal(validateAdjustment(result), result);
+  });
+});
+
+describe('discount widget vendor attribution', () => {
+  it('includes Agent Vendor metric and Anthropic badge in html', () => {
+    const order = makeOrder({ subtotal: 160, couponCode: 'VIP_BUNDLE' });
+    const adj = plugin.apply(order);
+    const widget = renderWidget({ ...adj, status: 'ACTIVE' }, order);
+
+    assert.equal(validateWidgetOutput('discount', widget), widget);
+    assert.ok(widget.metrics.some((m) => m.label === 'Agent Vendor' && m.value === 'Anthropic Claude 5.5'));
+    assert.match(widget.html, /Built by Anthropic Claude Sonnet 5\.5/);
+    assert.equal(widget.badge, 'VIP_BUNDLE ACTIVE');
+    assert.ok(widget.metrics.some((m) => m.label === 'Savings' && m.value === '-$40.00'));
+  });
+});

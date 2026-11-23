@@ -144,6 +144,7 @@ export function renderWidget(step, orderContext) {
       value: appliedCoupon || (requestedCoupon ? `${requestedCoupon} (Unapplied)` : 'None'),
     },
     { label: 'Next Tier Gap', value: nextTierMetricValue },
+    { label: 'Agent Vendor', value: 'Anthropic Claude 5.5' },
   ];
 
   const headerGoalText = nextTier
@@ -209,6 +210,7 @@ export function renderWidget(step, orderContext) {
     `<div style="display:flex;flex-wrap:wrap;gap:8px;">`,
     tierPillsHtml,
     `</div>`,
+    `<div style="align-self:flex-start;padding:3px 10px;border-radius:999px;border:1px solid rgba(167,139,250,0.55);background:rgba(167,139,250,0.14);color:#c4b5fd;font-size:0.7rem;font-weight:700;">Built by Anthropic Claude Sonnet 5.5</div>`,
     `</div>`,
   ].join('');
 
