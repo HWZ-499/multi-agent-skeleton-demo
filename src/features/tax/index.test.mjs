@@ -29,6 +29,10 @@ describe('Tax Plugin (Slot 2)', () => {
     { region: 'US-NY', subtotal: 100, expectedRate: 0.08, expectedDelta: 8 },
     { region: 'EU-DE', subtotal: 100, expectedRate: 0.19, expectedDelta: 19 },
     { region: 'CN', subtotal: 100, expectedRate: 0.13, expectedDelta: 13 },
+    { region: 'US-TX', subtotal: 100, expectedRate: 0.0625, expectedDelta: 6.25 },
+    { region: 'US-TX', subtotal: 19.99, expectedRate: 0.0625, expectedDelta: 1.25 },
+    { region: 'SG', subtotal: 100, expectedRate: 0.09, expectedDelta: 9 },
+    { region: 'SG', subtotal: 250, expectedRate: 0.09, expectedDelta: 22.5 },
     { region: 'UK', subtotal: 100, expectedRate: 0.05, expectedDelta: 5 },
     { region: 'JP', subtotal: 200, expectedRate: 0.05, expectedDelta: 10 },
   ];
@@ -103,6 +107,20 @@ describe('Tax Widget (Slot 2)', () => {
       expectedTableRegion: 'CN',
     },
     {
+      region: 'US-TX',
+      subtotal: 100,
+      expectedTaxType: 'Texas Sales Tax',
+      expectedRatePct: '6.25%',
+      expectedTableRegion: 'US-TX',
+    },
+    {
+      region: 'SG',
+      subtotal: 200,
+      expectedTaxType: 'Singapore GST',
+      expectedRatePct: '9%',
+      expectedTableRegion: 'SG',
+    },
+    {
       region: 'JP',
       subtotal: 100,
       expectedTaxType: 'Standard International Tax',
@@ -138,7 +156,7 @@ describe('Tax Widget (Slot 2)', () => {
 
       assert.match(widget.html, /role="progressbar"/);
       assert.match(widget.html, /style="/);
-      for (const tableRegion of ['US-CA', 'US-NY', 'EU-DE', 'CN', 'Other']) {
+      for (const tableRegion of ['US-CA', 'US-NY', 'EU-DE', 'CN', 'US-TX', 'SG', 'Other']) {
         assert.match(widget.html, new RegExp(`data-region="${tableRegion}"`));
       }
 
@@ -164,5 +182,26 @@ describe('Tax Widget (Slot 2)', () => {
     assert.doesNotMatch(widget.html, /<script>/);
     assert.match(widget.html, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
     assert.match(widget.html, /data-region="Other" data-active="true"/);
+  });
+
+  it('renders US-TX and SG rows with jurisdiction names and per-row tax in the comparison table', () => {
+    const ctx = makeOrder({ region: 'CN', subtotal: 100 });
+    const widget = renderWidget({ ...plugin.apply(ctx), status: 'ACTIVE' }, ctx);
+
+    assert.match(widget.html, /data-region="US-TX" data-active="false"[^>]*>.*?Texas Sales Tax.*?6\.25%.*?\$6\.25/s);
+    assert.match(widget.html, /data-region="SG" data-active="false"[^>]*>.*?Singapore GST.*?9%.*?\$9\.00/s);
+  });
+
+  it('includes the Agent Vendor metric and the vendor attribution badge for every region', () => {
+    for (const region of ['US-CA', 'US-NY', 'EU-DE', 'CN', 'US-TX', 'SG', 'JP']) {
+      const ctx = makeOrder({ region, subtotal: 100 });
+      const widget = renderWidget({ ...plugin.apply(ctx), status: 'ACTIVE' }, ctx);
+
+      assert.deepEqual(validateWidgetOutput('tax', widget), widget);
+      const vendorMetric = widget.metrics.find((m) => m.label === 'Agent Vendor');
+      assert.deepEqual(vendorMetric, { label: 'Agent Vendor', value: 'Anthropic Claude Opus 5.5' });
+      assert.ok(widget.html.includes('Built by Anthropic Claude Opus 5.5'));
+      assert.match(widget.html, /data-vendor-badge="true"/);
+    }
   });
 });

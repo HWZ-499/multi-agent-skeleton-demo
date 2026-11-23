@@ -2,6 +2,7 @@ import { roundCurrency, validateWidgetOutput } from '../../types/contracts.mjs';
 import { DEFAULT_TAX_REGIME, TAX_REGIMES, resolveTaxRegime } from './index.mjs';
 
 const MAX_METER_RATE = 0.2;
+export const AGENT_VENDOR = 'Anthropic Claude Opus 5.5';
 
 function escapeHtml(value) {
   return String(value)
@@ -88,6 +89,16 @@ function buildComparisonTableHtml({ activeRegime, activeRegion, effectiveRate, c
   );
 }
 
+function buildVendorBadgeHtml() {
+  return (
+    `<div style="display: flex; justify-content: flex-end;">` +
+      `<span data-vendor-badge="true" style="display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; background: rgba(167, 139, 250, 0.16); color: #ddd6fe; border: 1px solid rgba(167, 139, 250, 0.4);">` +
+        `Built by ${escapeHtml(AGENT_VENDOR)}` +
+      `</span>` +
+    `</div>`
+  );
+}
+
 /**
  * Renders the Slot 2 tax widget for the Checkout & Pricing Studio UI.
  * @param {Partial<import('../../types/contracts.mjs').PluginAdjustment & { status?: string }>} step
@@ -138,6 +149,7 @@ export function renderWidget(step, orderContext = {}) {
         comparisonBase,
         hasSubtotal,
       }) +
+      buildVendorBadgeHtml() +
     `</div>`;
 
   return validateWidgetOutput('tax', {
@@ -150,6 +162,7 @@ export function renderWidget(step, orderContext = {}) {
       { label: 'Active Region', value: regime.isFallback && region !== 'Other' ? `${region} (Other)` : region },
       { label: 'Effective Rate', value: ratePercent },
       { label: 'Tax Amount', value: `+${formatUsd(deltaAmount)}` },
+      { label: 'Agent Vendor', value: AGENT_VENDOR },
     ],
     html,
   });
