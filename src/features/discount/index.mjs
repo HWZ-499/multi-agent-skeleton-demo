@@ -26,15 +26,36 @@ import { roundCurrency } from '../../types/contracts.mjs';
 export const plugin = {
   id: 'discount',
   order: 10,
-  implemented: false,
+  implemented: true,
 
   /**
    * @param {import('../../types/contracts.mjs').OrderContext} ctx
    * @returns {import('../../types/contracts.mjs').PluginAdjustment}
    */
   apply(ctx) {
-    void roundCurrency;
-    void ctx;
-    throw new Error('Discount slot not implemented yet');
+    if (ctx.couponCode === 'VIP20' && ctx.subtotal >= 100) {
+      return {
+        pluginId: 'discount',
+        label: 'VIP20 (20% Off)',
+        deltaAmount: -roundCurrency(ctx.subtotal * 0.20),
+        meta: { appliedCoupon: 'VIP20' },
+      };
+    }
+
+    if (ctx.couponCode === 'SAVE10' && ctx.subtotal >= 50) {
+      return {
+        pluginId: 'discount',
+        label: 'SAVE10 ($10 Off)',
+        deltaAmount: -10,
+        meta: { appliedCoupon: 'SAVE10' },
+      };
+    }
+
+    return {
+      pluginId: 'discount',
+      label: 'No Discount',
+      deltaAmount: 0,
+      meta: { appliedCoupon: null },
+    };
   },
 };
