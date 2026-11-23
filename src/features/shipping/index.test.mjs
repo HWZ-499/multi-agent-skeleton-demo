@@ -142,6 +142,8 @@ describe('Shipping Widget (renderWidget)', () => {
       { label: 'Delivery Window', value: '5-7 Business Days (Ground)' },
       { label: 'Weight Tier Cost', value: '$11.00 (3 kg)' },
       { label: 'Free Ground Unlock', value: '45%' },
+      { label: 'Est. Carbon', value: '1.20 kg CO2' },
+      { label: 'Agent Vendor', value: 'Google Gemini 3.8' },
     ]);
 
     assert.match(widget.html, /width:45%/);
@@ -180,6 +182,8 @@ describe('Shipping Widget (renderWidget)', () => {
       { label: 'Delivery Window', value: '5-7 Business Days (Ground)' },
       { label: 'Weight Tier Cost', value: '$0.00 ($10.00 waived)' },
       { label: 'Free Ground Unlock', value: '100%' },
+      { label: 'Est. Carbon', value: '1.00 kg CO2' },
+      { label: 'Agent Vendor', value: 'Google Gemini 3.8' },
     ]);
 
     assert.match(widget.html, /width:100%/);
@@ -201,6 +205,8 @@ describe('Shipping Widget (renderWidget)', () => {
       { label: 'Delivery Window', value: '1-2 Business Days (Air)' },
       { label: 'Weight Tier Cost', value: '$10.00 (2.5 kg)' },
       { label: 'Free Ground Unlock', value: '80%' },
+      { label: 'Est. Carbon', value: '4.50 kg CO2' },
+      { label: 'Agent Vendor', value: 'Google Gemini 3.8' },
     ]);
     assert.match(underWidget.html, /Express Air · 1-2 Business Days \(Air\)/);
     assert.match(underWidget.html, /width:80%/);
@@ -217,9 +223,43 @@ describe('Shipping Widget (renderWidget)', () => {
       { label: 'Delivery Window', value: '1-2 Business Days (Air)' },
       { label: 'Weight Tier Cost', value: '$0.00 ($10.00 waived)' },
       { label: 'Free Ground Unlock', value: '100%' },
+      { label: 'Est. Carbon', value: '4.50 kg CO2' },
+      { label: 'Agent Vendor', value: 'Google Gemini 3.8' },
     ]);
     assert.match(freeBaseWidget.html, /width:100%/);
     assert.match(freeBaseWidget.html, /Unlocked \(100%\)/);
     assert.match(freeBaseWidget.html, /Base \$0\.00 \+ Air \$15\.00/);
+  });
+
+  it('renders carbon emission metric and vendor attribution badge', () => {
+    // Ground shipping: weight 5kg -> 5 * 0.4 = 2.00 kg CO2
+    const groundCtx = makeContext({ weightKg: 5, isExpress: false });
+    const groundWidget = renderWidget({ ...plugin.apply(groundCtx), status: 'ACTIVE' }, groundCtx);
+    assert.deepEqual(validateWidgetOutput('shipping', groundWidget), groundWidget);
+
+    const groundCarbon = groundWidget.metrics.find((m) => m.label === 'Est. Carbon');
+    assert.ok(groundCarbon, 'Est. Carbon metric should exist');
+    assert.equal(groundCarbon.value, '2.00 kg CO2');
+
+    const groundVendor = groundWidget.metrics.find((m) => m.label === 'Agent Vendor');
+    assert.ok(groundVendor, 'Agent Vendor metric should exist');
+    assert.equal(groundVendor.value, 'Google Gemini 3.8');
+
+    assert.match(groundWidget.html, /Built by Google Gemini 3\.8 Flash/);
+
+    // Express shipping: weight 5kg -> 5 * 1.8 = 9.00 kg CO2
+    const expressCtx = makeContext({ weightKg: 5, isExpress: true });
+    const expressWidget = renderWidget({ ...plugin.apply(expressCtx), status: 'ACTIVE' }, expressCtx);
+    assert.deepEqual(validateWidgetOutput('shipping', expressWidget), expressWidget);
+
+    const expressCarbon = expressWidget.metrics.find((m) => m.label === 'Est. Carbon');
+    assert.ok(expressCarbon, 'Est. Carbon metric should exist');
+    assert.equal(expressCarbon.value, '9.00 kg CO2');
+
+    const expressVendor = expressWidget.metrics.find((m) => m.label === 'Agent Vendor');
+    assert.ok(expressVendor, 'Agent Vendor metric should exist');
+    assert.equal(expressVendor.value, 'Google Gemini 3.8');
+
+    assert.match(expressWidget.html, /Built by Google Gemini 3\.8 Flash/);
   });
 });

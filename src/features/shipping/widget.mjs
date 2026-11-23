@@ -45,6 +45,7 @@ export function renderWidget(step, orderContext) {
     : roundCurrency(Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal));
 
   const deliveryWindow = isExpress ? '1-2 Business Days (Air)' : '5-7 Business Days (Ground)';
+  const co2Kg = roundCurrency(weightKg * (isExpress ? 1.8 : 0.4));
 
   const badge = isExpress
     ? 'EXPRESS AIR'
@@ -81,6 +82,14 @@ export function renderWidget(step, orderContext) {
     {
       label: 'Free Ground Unlock',
       value: `${unlockProgress}%`,
+    },
+    {
+      label: 'Est. Carbon',
+      value: `${co2Kg.toFixed(2)} kg CO2`,
+    },
+    {
+      label: 'Agent Vendor',
+      value: 'Google Gemini 3.8',
     },
   ];
 
@@ -122,6 +131,9 @@ export function renderWidget(step, orderContext) {
     '    <div style="width:100%;height:10px;background:#0b1020;border:1px solid #263459;border-radius:999px;overflow:hidden;">',
     `      <div style="width:${unlockProgress}%;height:100%;background:${progressBarGradient};border-radius:999px;transition:width 0.25s ease;"></div>`,
     '    </div>',
+    '  </div>',
+    '  <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:2px;">',
+    '    <span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:#818cf8;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:999px;padding:2px 8px;font-weight:600;">Built by Google Gemini 3.8 Flash</span>',
     '  </div>',
     '</div>',
   ].join('\n');
