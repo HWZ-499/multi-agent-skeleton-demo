@@ -38,15 +38,30 @@ import { roundCurrency } from '../../types/contracts.mjs';
 export const plugin = {
   id: 'loyalty',
   order: 15,
-  implemented: false,
+  implemented: true,
 
   /**
    * @param {import('../../types/contracts.mjs').OrderContext} ctx
    * @returns {import('../../types/contracts.mjs').PluginAdjustment}
    */
   apply(ctx) {
-    void roundCurrency;
-    void ctx;
-    throw new Error('Loyalty slot not implemented yet (assigned to Codex)');
+    const pointsEarned = Math.floor(ctx.subtotal * 10);
+    let tier = 'Standard Member (0% Cashback)';
+    let deltaAmount = 0;
+
+    if (ctx.subtotal >= 200) {
+      tier = 'Platinum (5% Cashback)';
+      deltaAmount = -roundCurrency(ctx.subtotal * 0.05);
+    } else if (ctx.subtotal >= 100) {
+      tier = 'Gold (2% Cashback)';
+      deltaAmount = -roundCurrency(ctx.subtotal * 0.02);
+    }
+
+    return {
+      pluginId: 'loyalty',
+      label: `Loyalty: ${tier}`,
+      deltaAmount,
+      meta: { tier, pointsEarned },
+    };
   },
 };
