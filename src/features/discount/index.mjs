@@ -47,6 +47,15 @@ export const plugin = {
       };
     }
 
+    if (ctx.couponCode === 'VIP_BUNDLE' && ctx.subtotal >= 150) {
+      return {
+        pluginId: 'discount',
+        label: 'VIP_BUNDLE (25% Off)',
+        deltaAmount: -roundCurrency(ctx.subtotal * 0.25),
+        meta: { appliedCoupon: 'VIP_BUNDLE' },
+      };
+    }
+
     if (ctx.couponCode === 'VIP20' && ctx.subtotal >= 100) {
       return {
         pluginId: 'discount',
